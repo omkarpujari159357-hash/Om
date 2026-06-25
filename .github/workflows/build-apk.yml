@@ -17,9 +17,11 @@ jobs:
           distribution: 'temurin'
       - uses: android-actions/setup-android@v3
 
+      - name: List all files
+        run: find . -type f | head -50
+
       - name: Create React Native project
-        run: |
-          npx @react-native-community/cli@12 init CallGuardApp --version 0.73.0 --skip-install
+        run: npx @react-native-community/cli@12 init CallGuardApp --version 0.73.0 --skip-install
 
       - name: Copy source files
         run: |
@@ -27,15 +29,15 @@ jobs:
           cp package.json CallGuardApp/package.json
           mkdir -p CallGuardApp/src/screens
           mkdir -p CallGuardApp/src/hooks
-          cp HomeScreen.tsx CallGuardApp/src/screens/
-          cp ContactsScreen.tsx CallGuardApp/src/screens/
-          cp RecordScreen.tsx CallGuardApp/src/screens/
-          cp SettingsScreen.tsx CallGuardApp/src/screens/
-          cp translations.ts CallGuardApp/src/
-          cp useCallGuard.ts CallGuardApp/src/hooks/
+          find . -name "HomeScreen.tsx" -exec cp {} CallGuardApp/src/screens/ \;
+          find . -name "ContactsScreen.tsx" -exec cp {} CallGuardApp/src/screens/ \;
+          find . -name "RecordScreen.tsx" -exec cp {} CallGuardApp/src/screens/ \;
+          find . -name "SettingsScreen.tsx" -exec cp {} CallGuardApp/src/screens/ \;
+          find . -name "translations.ts" -exec cp {} CallGuardApp/src/ \;
+          find . -name "useCallGuard.ts" -exec cp {} CallGuardApp/src/hooks/ \;
           PKG=CallGuardApp/android/app/src/main/java/com/callguardapp
-          cp CallGuardScreeningService.kt $PKG/
-          cp CallGuardModule.kt $PKG/
+          find . -name "CallGuardScreeningService.kt" -exec cp {} $PKG/ \;
+          find . -name "CallGuardModule.kt" -exec cp {} $PKG/ \;
 
       - name: Install dependencies
         run: cd CallGuardApp && npm install
