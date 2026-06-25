@@ -10,14 +10,17 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '18'
       - uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
       - uses: android-actions/setup-android@v3
+
       - name: Create React Native project
-        run: npx react-native@0.73.0 init CallGuardApp --template react-native-template-typescript --skip-install
+        run: |
+          npx @react-native-community/cli@12 init CallGuardApp --version 0.73.0 --skip-install
+
       - name: Copy source files
         run: |
           cp App.tsx CallGuardApp/App.tsx
@@ -33,13 +36,16 @@ jobs:
           PKG=CallGuardApp/android/app/src/main/java/com/callguardapp
           cp CallGuardScreeningService.kt $PKG/
           cp CallGuardModule.kt $PKG/
+
       - name: Install dependencies
         run: cd CallGuardApp && npm install
+
       - name: Build APK
         run: |
           cd CallGuardApp/android
           chmod +x gradlew
           ./gradlew assembleRelease --no-daemon
+
       - uses: actions/upload-artifact@v4
         with:
           name: CallGuard-APK
