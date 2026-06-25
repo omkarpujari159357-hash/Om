@@ -16,11 +16,32 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
       - uses: android-actions/setup-android@v3
-      - run: npm install
-      - run: chmod +x android/gradlew
-      - run: cd android && ./gradlew assembleRelease --no-daemon
+      - name: Create React Native project
+        run: npx react-native@0.73.0 init CallGuardApp --template react-native-template-typescript --skip-install
+      - name: Copy source files
+        run: |
+          cp App.tsx CallGuardApp/App.tsx
+          cp package.json CallGuardApp/package.json
+          mkdir -p CallGuardApp/src/screens
+          mkdir -p CallGuardApp/src/hooks
+          cp HomeScreen.tsx CallGuardApp/src/screens/
+          cp ContactsScreen.tsx CallGuardApp/src/screens/
+          cp RecordScreen.tsx CallGuardApp/src/screens/
+          cp SettingsScreen.tsx CallGuardApp/src/screens/
+          cp translations.ts CallGuardApp/src/
+          cp useCallGuard.ts CallGuardApp/src/hooks/
+          PKG=CallGuardApp/android/app/src/main/java/com/callguardapp
+          cp CallGuardScreeningService.kt $PKG/
+          cp CallGuardModule.kt $PKG/
+      - name: Install dependencies
+        run: cd CallGuardApp && npm install
+      - name: Build APK
+        run: |
+          cd CallGuardApp/android
+          chmod +x gradlew
+          ./gradlew assembleRelease --no-daemon
       - uses: actions/upload-artifact@v4
         with:
           name: CallGuard-APK
-          path: android/app/build/outputs/apk/release/app-release.apk
+          path: CallGuardApp/android/app/build/outputs/apk/release/app-release.apk
           retention-days: 30
